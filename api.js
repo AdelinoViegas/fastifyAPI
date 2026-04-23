@@ -1,5 +1,21 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
+import { createConnection } from "mongoose";
+import { Schema } from "mongoose";
+
+//conectando ao banco de dados
+const db = await createConnection("mongodb://localhost:27017/api");
+
+//Esquema e Modelo do usuário
+const userModel = db.model("User", new Schema({
+  name: String, 
+  email: String, 
+  contact: String,
+  age: Number
+}, { 
+  timestamps: true,
+  collection: "users"
+}));
 
 const fastify = Fastify({logger: true});
 
@@ -19,39 +35,82 @@ fastify.get("/users", async (req, res) => {
   return usersData;
 });
 
-fastify.get("/users/:id", async (req, res) => {
-  const { id } = req.params;
+fastify.get("/users/:email", async (req, res) => {
+  const { email } = req.params;
+  console.log("hacker");
+  console.log(req.id);
+  console.log(req.params.email);
+  const data = await userModel.findOne({ email });
+
+  if(!data)
+    return res.status(404).send({message: "Nenhuma conrrespondência encontrada para o email fornecido.", status: false});
+
+  return res.status(200).send({message: "email encontrado", user: data, status: true});
+});
+
+fastify.delete("/users/:email", async (req, res) => {
+  const { email } = req.params;
    
-  const user = usersData.find( u => u.id === Number(id));
+  const data = await userModel.deleteOne({ email });
 
-  if(!user) 
-    return res.status(404).send({message: "O usuário não foi encontrado", status: false});
+  if(!data)
+    return res.status(404).send({message: "usuário não encontrado", status: false});
+
+  return res.status(200).send({message: "usuário deletado com sucesso", user: data, status: true});
+});
+
+fastify.put("/users/:id", async (req, res) => {
+  const id = req.params.id;
+  const { name, email, age, contact } = req.body;
+
+  if(!name || !email || !age || !contact)
+    return res.status(400).send({
+      message: "tosos campos devem ser preenchidos",
+      status: false
+    });
   
-  return user;
-})
+   await userModel.findByIdAndUpdate({ _id: id }, { email, name, age, contact});
+   
+   return res.status(200).send({
+    message: "usuário atualizado com sucesso",
+    status: true
+   })
 
+});
+
+fastify.patch("/users/:id", async (req, res) => {
+  const id = req.params.id;
+  const { name , age } = req.body;
+  
+  if(!name || !age)
+    return res.status(400).send({
+      message: "Os campos nome e idade são obrigatórios",
+      status: false
+    });
+
+    await userModel.updateOne({ _id:id }, {name, age});
+
+    res.status(200).send({
+      message: "Usuário atualizado com sucesso",
+      status: true
+    });
+});
 
 fastify.post("/users", async (req, res) => {
-  const { name, email } = req.body;  
-  console.log(name, email);
-  if (!name || !email) {
+  const { name, email, age, contact } = req.body;  
+
+  if (!name || !email || !age || !contact) {
     return res.status(400).send({ 
-      message: "Nome e email são obrigatórios", 
+      message: "O preenchimento de todos os campos é obrigatório", 
       status: false 
     });
   }
-
-  const newUser = {
-    id: usersData.length + 1,
-    name,
-    email
-  };
-
-  usersData.push(newUser);
+  
+  await userModel.create({ name, email, age, contact });
 
   return res.status(201).send({
     message: "Usuário criado com sucesso!",
-    user: newUser
+    status: true,
   });
 });
 
