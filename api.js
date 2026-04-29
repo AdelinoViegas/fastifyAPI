@@ -2,7 +2,6 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 
 const fastify = Fastify({logger: true});
-
 await fastify.register(cors, { origin: "*"});
 
 const usersData = [
