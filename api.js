@@ -32,20 +32,25 @@ fastify.get("/", async (req, res) => {
 });
 
 fastify.get("/users", async (req, res) => {
-  return usersData;
+  const users = await userModel.find();
+  return res.status(200).send(users);
 });
 
-fastify.get("/users/:email", async (req, res) => {
-  const { email } = req.params;
-  console.log("hacker");
-  console.log(req.id);
-  console.log(req.params.email);
-  const data = await userModel.findOne({ email });
+fastify.get("/users/:id", async (req, res) => {
+  const { id } = req.params;
 
-  if(!data)
-    return res.status(404).send({message: "Nenhuma conrrespondência encontrada para o email fornecido.", status: false});
+  const user = await userModel.findOne({ _id: id });
 
-  return res.status(200).send({message: "email encontrado", user: data, status: true});
+  if (!user) {
+    return res.status(404).send({ message: "Usuário não encontrado", status: false });
+  }
+
+  return res.status(200).send({
+    name: user.name,
+    email: user.email,
+    age: user.age,
+    contact: user.contact
+  });
 });
 
 fastify.delete("/users/:email", async (req, res) => {
@@ -114,7 +119,7 @@ fastify.post("/users", async (req, res) => {
   });
 });
 
-fastify.listen({port: 2026}, (err, address) => {
+fastify.listen({port: 3000}, (err, address) => {
   if(err){
     fastify.log.error(err);
     process.exit(1)
