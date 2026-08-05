@@ -18,7 +18,6 @@ const userModel = db.model("User", new Schema({
 }));
 
 const fastify = Fastify({logger: true});
-
 await fastify.register(cors, { origin: "*"});
 
 const usersData = [
