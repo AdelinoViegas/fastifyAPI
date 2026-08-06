@@ -20,12 +20,6 @@ const userModel = db.model("User", new Schema({
 const fastify = Fastify({logger: true});
 await fastify.register(cors, { origin: "*"});
 
-const usersData = [
-  {id: 1, name: "Hacker Adelino Viegas", email: "adelino@example.com"},
-  {id: 2, name: "Instrumentista Musical", email: "instrumentista@example.com"},
-  {id: 3, name: "Engenheiro de Software", email: "engenheirosoftware@example.com"}
-];
-
 fastify.get("/", async (req, res) => {
   res.send({message: "Rota existente com sucesso!", status: true});
 });
