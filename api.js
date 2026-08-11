@@ -35,7 +35,7 @@ fastify.get("/users/:id", async (req, res) => {
   const user = await userModel.findOne({ _id: id });
 
   if (!user) {
-    return res.status(404).send({ message: "Usuário não encontrado", status: false });
+    return res.status(404).send({ message: "Usuário não encontrado!", status: false });
   }
 
   return res.status(200).send({
@@ -52,9 +52,9 @@ fastify.delete("/users/:email", async (req, res) => {
   const data = await userModel.deleteOne({ email });
 
   if(!data)
-    return res.status(404).send({message: "usuário não encontrado", status: false});
+    return res.status(404).send({message: "usuário não encontrado!", status: false});
 
-  return res.status(200).send({message: "usuário deletado com sucesso", user: data, status: true});
+  return res.status(200).send({message: "usuário deletado com sucesso!", user: data, status: true});
 });
 
 fastify.put("/users/:id", async (req, res) => {
