@@ -3,8 +3,9 @@ import cors from "@fastify/cors";
 import { createConnection } from "mongoose";
 import { Schema } from "mongoose";
 
-//conectando ao banco de dados
+//porta e conexão com mongoDB
 const db = await createConnection("mongodb://localhost:27017/api");
+const port = 3000;
 
 //Esquema e Modelo do usuário
 const userModel = db.model("User", new Schema({
@@ -112,7 +113,7 @@ fastify.post("/users", async (req, res) => {
   });
 });
 
-fastify.listen({port: 3000}, (err, address) => {
+fastify.listen(port, (err, address) => {
   if(err){
     fastify.log.error(err);
     process.exit(1)
